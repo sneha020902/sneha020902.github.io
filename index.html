@@ -8,117 +8,194 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 *{cursor:none!important;}
-body{background:#000;color:#fff;font-family:'DM Mono',monospace;overflow-x:hidden;}
-#cur{position:fixed;width:10px;height:10px;background:#c8a96e;border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .3s,height .3s;}
-#cur.big{width:50px;height:50px;background:rgba(200,169,110,0.2);border:1px solid #c8a96e;}
+
+:root{
+  --blue:#38BDF8;
+  --blue-glow:rgba(56,189,248,0.15);
+  --blue-border:rgba(56,189,248,0.2);
+  --dark:#050a14;
+  --dark2:#070e18;
+  --cream:#f2efe8;
+}
+
+body{background:var(--dark);color:#fff;font-family:'DM Mono',monospace;overflow-x:hidden;}
+
+/* ── CURSOR ── */
+#cur{position:fixed;width:10px;height:10px;background:var(--blue);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .3s,height .3s;}
+#cur.big{width:46px;height:46px;background:rgba(56,189,248,0.1);border:1px solid var(--blue);}
+
+/* ── LOADER ── */
 #loader{position:fixed;inset:0;background:#000;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s,visibility .8s;}
 #loader.gone{opacity:0;visibility:hidden;}
-.l-name{font-family:'Unbounded',sans-serif;font-weight:200;font-size:clamp(2rem,5vw,4rem);color:#fff;letter-spacing:-.02em;margin-bottom:3rem;overflow:hidden;}
+.l-name{font-family:'Unbounded',sans-serif;font-weight:200;font-size:clamp(1.8rem,4vw,3.5rem);color:#fff;letter-spacing:-.02em;margin-bottom:3rem;overflow:hidden;}
 .l-name span{display:inline-block;transform:translateY(100%);animation:up .8s .3s cubic-bezier(.76,0,.24,1) forwards;}
-.l-pct{font-size:.7rem;letter-spacing:.2em;color:#666;}
-.l-bar{position:absolute;bottom:0;left:0;height:2px;background:#c8a96e;width:0;transition:width .05s;}
+.l-pct{font-size:.65rem;letter-spacing:.2em;color:#444;}
+.l-bar{position:absolute;bottom:0;left:0;height:2px;background:var(--blue);width:0;transition:width .05s;}
+
+/* ── KEYFRAMES ── */
 @keyframes up{to{transform:translateY(0);}}
 @keyframes fi{from{opacity:0;}to{opacity:1;}}
+@keyframes pulse{0%,100%{opacity:.5;}50%{opacity:1;}}
+@keyframes aurora{0%{transform:translate(0,0) scale(1);}50%{transform:translate(3%,2%) scale(1.05);}100%{transform:translate(-2%,3%) scale(.98);}}
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+@keyframes countUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.8rem 3rem;display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.9);backdrop-filter:blur(10px);border-bottom:1px solid rgba(200,169,110,0.1);}
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.76,0,.24,1),transform .8s cubic-bezier(.76,0,.24,1);}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity .8s cubic-bezier(.76,0,.24,1),transform .8s cubic-bezier(.76,0,.24,1);}
+.reveal-left.visible{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(40px);transition:opacity .8s cubic-bezier(.76,0,.24,1),transform .8s cubic-bezier(.76,0,.24,1);}
+.reveal-right.visible{opacity:1;transform:translateX(0);}
+.reveal-delay-1{transition-delay:.1s;}
+.reveal-delay-2{transition-delay:.2s;}
+.reveal-delay-3{transition-delay:.3s;}
+.reveal-delay-4{transition-delay:.4s;}
+.reveal-delay-5{transition-delay:.5s;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.5rem 4rem;display:flex;align-items:center;justify-content:space-between;background:rgba(5,10,20,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--blue-border);}
 .n-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.n-photo{width:34px;height:34px;border-radius:50%;object-fit:cover;object-position:center top;border:1.5px solid rgba(200,169,110,0.5);}
-.n-links{display:flex;gap:2rem;}
-.n-link{color:#888;text-decoration:none;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;transition:color .3s;}
-.n-link:hover{color:#c8a96e;}
+.n-photo{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:center top;border:1.5px solid var(--blue-border);}
+.n-name{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;color:#666;text-transform:uppercase;}
+.n-links{display:flex;gap:2.5rem;}
+.n-link{color:#444;text-decoration:none;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;transition:color .3s;}
+.n-link:hover{color:var(--blue);}
 
-/* HERO */
-#hero{min-height:100vh;background:#000;display:flex;flex-direction:column;justify-content:flex-end;padding:3rem;position:relative;overflow:hidden;}
-.h-ghost{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(8rem,20vw,22rem);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.04);white-space:nowrap;user-select:none;pointer-events:none;}
-.h-tag{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#c8a96e;margin-bottom:1.5rem;opacity:0;animation:fi .6s 1.8s forwards;}
-.h-name{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(3.5rem,9vw,10rem);line-height:.92;letter-spacing:-.04em;color:#fff;margin-bottom:2.5rem;}
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding:3rem;}
+.h-aurora{position:absolute;inset:0;background:var(--dark);z-index:0;}
+.h-aurora::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 40%,rgba(56,189,248,.18) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 60%,rgba(14,165,233,.12) 0%,transparent 60%),radial-gradient(ellipse 100% 40% at 50% 100%,rgba(2,132,199,.15) 0%,transparent 60%);animation:aurora 10s ease-in-out infinite alternate;}
+.h-aurora::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 70% 20%,rgba(56,189,248,.08) 0%,transparent 60%);animation:aurora 14s ease-in-out infinite alternate-reverse;}
+.h-grid{position:absolute;inset:0;z-index:1;background-image:linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);}
+.h-content{position:relative;z-index:3;max-width:920px;width:100%;}
+.h-badge{display:inline-flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);border:1px solid var(--blue-border);padding:.42rem 1rem;border-radius:100px;margin-bottom:2.8rem;opacity:0;animation:fi .6s 1.8s forwards;background:rgba(56,189,248,.06);}
+.h-badge::before{content:'';width:6px;height:6px;background:var(--blue);border-radius:50%;animation:pulse 2s infinite;}
+.h-name{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(3.5rem,10vw,9rem);line-height:.9;letter-spacing:-.04em;color:#fff;margin-bottom:1.2rem;}
 .h-line{overflow:hidden;display:block;}
 .h-line span{display:block;transform:translateY(110%);animation:up .9s cubic-bezier(.76,0,.24,1) forwards;}
-.h-line:nth-child(1) span{animation-delay:1.3s;}
-.h-line:nth-child(2) span{animation-delay:1.45s;}
-.h-line:nth-child(3) span{animation-delay:1.6s;font-family:'Libre Baskerville',serif;font-style:italic;font-weight:400;color:#c8a96e;}
-.h-bottom{display:flex;justify-content:space-between;align-items:flex-end;opacity:0;animation:fi .6s 2.1s forwards;}
-.h-desc{font-family:'Libre Baskerville',serif;font-size:.88rem;color:#666;line-height:1.75;max-width:320px;}
-.h-scroll{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:#555;display:flex;flex-direction:column;align-items:center;gap:10px;}
-.h-scrollline{width:1px;height:50px;background:linear-gradient(to bottom,#555,transparent);}
+.h-line:nth-child(1) span{animation-delay:1.2s;}
+.h-line:nth-child(2) span{animation-delay:1.35s;color:var(--blue);}
+.h-role{font-family:'Libre Baskerville',serif;font-style:italic;font-size:clamp(1rem,2.5vw,1.45rem);color:rgba(255,255,255,.32);margin-bottom:2.5rem;overflow:hidden;}
+.h-role span{display:block;transform:translateY(110%);animation:up .9s 1.5s cubic-bezier(.76,0,.24,1) forwards;}
+.h-desc{font-family:'DM Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.28);line-height:2.1;letter-spacing:.05em;margin-bottom:3.5rem;opacity:0;animation:fi .6s 1.9s forwards;}
+.h-ctas{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;opacity:0;animation:fi .6s 2.1s forwards;}
+.h-cta-p{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;padding:.85rem 2rem;background:var(--blue);color:#000;border:1px solid var(--blue);transition:all .3s;}
+.h-cta-p:hover{background:transparent;color:var(--blue);}
+.h-cta-s{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;padding:.85rem 2rem;background:transparent;color:#666;border:1px solid rgba(255,255,255,.1);transition:all .3s;}
+.h-cta-s:hover{border-color:var(--blue);color:var(--blue);}
+.h-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.5rem;letter-spacing:.18em;text-transform:uppercase;color:#2a3a4a;z-index:3;opacity:0;animation:fi .6s 2.4s forwards;}
+.h-scrollline{width:1px;height:45px;background:linear-gradient(to bottom,rgba(56,189,248,.4),transparent);}
 
-/* ABOUT */
-#about{background:#f2efe8;padding:7rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
-.a-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:#c8a96e;margin-bottom:2.5rem;font-family:'DM Mono',monospace;}
-.a-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(2rem,4vw,3rem);line-height:1.05;letter-spacing:-.03em;color:#000;}
-.a-body{padding-top:3.5rem;}
-.a-p{font-family:'Libre Baskerville',serif;font-size:.95rem;line-height:1.85;color:#555;margin-bottom:1.75rem;}
-.a-p em{font-style:italic;color:#000;}
-.a-facts{margin-top:2.5rem;border-top:1px solid rgba(0,0,0,0.1);}
-.a-row{display:flex;justify-content:space-between;padding:1.1rem 0;border-bottom:1px solid rgba(0,0,0,0.08);font-size:.7rem;}
-.a-key{color:#999;letter-spacing:.08em;font-family:'DM Mono',monospace;}
-.a-val{color:#000;font-family:'DM Mono',monospace;}
+/* Stats bar */
+.h-stats{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;border-top:1px solid var(--blue-border);z-index:3;opacity:0;animation:fi .6s 2.3s forwards;}
+.h-stat{flex:1;max-width:200px;padding:1.1rem 1.5rem;border-right:1px solid var(--blue-border);text-align:center;}
+.h-stat:last-child{border-right:none;}
+.h-stat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1rem;color:var(--blue);display:block;margin-bottom:.3rem;}
+.h-stat-label{font-size:.48rem;letter-spacing:.12em;color:#2a3a4a;text-transform:uppercase;}
 
-/* STACK */
-#stack{background:#0a0800;padding:7rem 3rem;}
-.s-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:#c8a96e;margin-bottom:2.5rem;font-family:'DM Mono',monospace;}
-.s-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(2rem,4vw,3rem);line-height:1.05;letter-spacing:-.03em;color:#fff;margin-bottom:4rem;}
-.s-row{display:grid;grid-template-columns:160px 1fr;gap:2rem;padding:1.6rem 0;border-bottom:1px solid rgba(255,255,255,0.07);}
-.s-row:first-of-type{border-top:1px solid rgba(255,255,255,0.07);}
-.s-cat{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:#c8a96e;}
-.s-items{font-family:'Libre Baskerville',serif;font-size:.9rem;color:rgba(255,255,255,0.5);line-height:1.75;}
+/* ── MARQUEE ── */
+.marquee-wrap{background:var(--blue);overflow:hidden;padding:.75rem 0;border-top:1px solid rgba(56,189,248,.3);border-bottom:1px solid rgba(56,189,248,.3);}
+.marquee-track{display:flex;width:max-content;animation:marquee 25s linear infinite;}
+.marquee-item{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:#000;padding:0 2rem;white-space:nowrap;}
+.marquee-dot{color:rgba(0,0,0,.4);margin:0 .5rem;}
 
-/* PROJECTS */
-#projects{background:#000;padding:7rem 3rem;}
-.p-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;}
-.p-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.03em;color:#fff;line-height:1.05;}
-.p-count{font-size:.6rem;color:#555;letter-spacing:.15em;font-family:'DM Mono',monospace;}
-.p-item{border-top:1px solid rgba(255,255,255,0.08);padding:2.2rem 0;display:grid;grid-template-columns:65px 1fr auto;gap:1.5rem;align-items:center;cursor:pointer;position:relative;text-decoration:none;}
-.p-item::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:#c8a96e;transition:width .5s cubic-bezier(.76,0,.24,1);}
-.p-item:hover::after{width:100%;}
-.p-item:hover .pi-name{color:#c8a96e;}
-.p-item:hover .pi-arrow{transform:translate(4px,-4px);color:#c8a96e;}
-.pi-num{font-family:'DM Mono',monospace;font-size:.58rem;color:#555;letter-spacing:.1em;align-self:start;padding-top:4px;}
-.pi-name{font-family:'Unbounded',sans-serif;font-weight:300;font-size:clamp(.95rem,2.2vw,1.5rem);color:#fff;letter-spacing:-.02em;transition:color .3s;margin-bottom:.65rem;display:block;}
-.pi-tags{display:flex;gap:6px;flex-wrap:wrap;}
-.pi-tag{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.08em;padding:3px 8px;border:1px solid rgba(255,255,255,0.1);color:#666;border-radius:20px;}
-.pi-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
-.pi-arrow{font-size:1.3rem;color:rgba(255,255,255,0.2);transition:all .3s;}
-.pi-wip{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;padding:3px 9px;border-radius:20px;text-transform:uppercase;border:1px solid rgba(200,169,110,0.35);color:#c8a96e;}
-.pi-live{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;padding:3px 9px;border-radius:20px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.12);color:#555;}
+/* ── ABOUT ── */
+#about{background:var(--dark);padding:9rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start;border-top:1px solid var(--blue-border);}
+.a-label{font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:2rem;font-family:'DM Mono',monospace;}
+.a-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.8rem,3.5vw,2.8rem);line-height:1.1;letter-spacing:-.03em;color:#fff;}
+.a-title em{font-family:'Libre Baskerville',serif;font-style:italic;font-weight:400;color:var(--blue);}
+.a-body{padding-top:1rem;}
+.a-p{font-family:'Libre Baskerville',serif;font-size:.9rem;line-height:1.95;color:rgba(255,255,255,.45);margin-bottom:1.75rem;}
+.a-p em{font-style:italic;color:rgba(255,255,255,.8);}
+.a-facts{margin-top:2rem;border-top:1px solid var(--blue-border);}
+.a-row{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px solid rgba(56,189,248,.08);font-size:.65rem;}
+.a-key{color:#2a3a4a;letter-spacing:.08em;font-family:'DM Mono',monospace;}
+.a-val{color:rgba(255,255,255,.7);font-family:'DM Mono',monospace;text-align:right;}
 
-/* SKILLS */
-#skills{background:#000;border-top:1px solid rgba(255,255,255,0.06);padding:7rem 3rem;}
-.sk-layout{display:grid;grid-template-columns:1fr 2fr;gap:5rem;}
-.sk-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(2rem,3.5vw,2.8rem);letter-spacing:-.03em;color:#fff;line-height:1.05;position:sticky;top:3rem;}
-.sk-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);}
-.sk-block{background:#000;padding:1.8rem;transition:background .3s;}
-.sk-block:hover{background:#0d0d0d;}
-.sk-cat{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:#c8a96e;margin-bottom:1rem;}
-.sk-list{font-family:'Libre Baskerville',serif;font-size:.82rem;color:rgba(255,255,255,0.42);line-height:2;}
+/* ── STACK ── */
+#stack{background:var(--dark2);padding:9rem 4rem;border-top:1px solid var(--blue-border);}
+.s-label{font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:2rem;font-family:'DM Mono',monospace;}
+.s-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.8rem,3.5vw,2.8rem);line-height:1.1;letter-spacing:-.03em;color:#fff;margin-bottom:4rem;}
+.s-title em{font-family:'Libre Baskerville',serif;font-style:italic;font-weight:400;color:var(--blue);}
+.s-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--blue-border);}
+.s-card{background:var(--dark2);padding:2rem;transition:all .4s cubic-bezier(.76,0,.24,1);border-top:2px solid rgba(56,189,248,0.15);position:relative;overflow:hidden;}
+.s-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 0%,rgba(56,189,248,0.06) 0%,transparent 70%);opacity:0;transition:opacity .4s;}
+.s-card:hover{background:#0a1525;border-top-color:var(--blue);transform:translateY(-4px);box-shadow:0 8px 30px rgba(56,189,248,0.12);}
+.s-card:hover::before{opacity:1;}
+.s-cat{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
+.s-cat::before{content:"";width:18px;height:1px;background:var(--blue);display:inline-block;}
+.s-items{font-family:'Libre Baskerville',serif;font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.95;transition:color .3s;}
+.s-card:hover .s-items{color:rgba(255,255,255,.7);}
 
-/* CONTACT */
-#contact{background:#000;min-height:90vh;display:flex;flex-direction:column;justify-content:center;padding:7rem 3rem;border-top:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden;}
-.c-ghost{position:absolute;bottom:-8%;right:-4%;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(6rem,17vw,19rem);color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.03);user-select:none;pointer-events:none;line-height:.85;}
-.c-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:#c8a96e;margin-bottom:2.5rem;}
-.c-head{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(2.8rem,7vw,8rem);line-height:.92;letter-spacing:-.04em;color:#fff;margin-bottom:4rem;}
-.c-head em{font-family:'Libre Baskerville',serif;font-style:italic;font-weight:400;color:#c8a96e;}
-.c-links{display:flex;flex-wrap:wrap;gap:.8rem;}
-.c-btn{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:1rem 2rem;border:1px solid rgba(255,255,255,0.15);color:#fff;display:inline-flex;align-items:center;gap:8px;transition:all .3s;position:relative;overflow:hidden;}
-.c-btn::before{content:'';position:absolute;inset:0;background:#c8a96e;transform:translateY(101%);transition:transform .35s cubic-bezier(.76,0,.24,1);}
-.c-btn:hover{color:#000;border-color:#c8a96e;}
+/* ── PROJECTS ── */
+#projects{background:var(--dark);padding:9rem 4rem;border-top:1px solid var(--blue-border);}
+.p-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--blue-border);}
+.p-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.8rem,3.5vw,2.8rem);letter-spacing:-.03em;color:#fff;line-height:1.1;}
+.p-title em{font-family:'Libre Baskerville',serif;font-style:italic;font-weight:400;color:var(--blue);}
+.p-count{font-size:.56rem;color:#2a3a4a;letter-spacing:.15em;font-family:'DM Mono',monospace;}
+.p-item{padding:2rem 0;display:grid;grid-template-columns:55px 1fr auto;gap:1.5rem;align-items:center;cursor:pointer;position:relative;text-decoration:none;border-bottom:1px solid rgba(56,189,248,.08);transition:padding .3s;}
+.p-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);transform:scaleY(0);transition:transform .4s cubic-bezier(.76,0,.24,1);}
+.p-item:hover::before{transform:scaleY(1);}
+.p-item:hover{padding-left:1.2rem;}
+.p-item:hover .pi-name{color:var(--blue);}
+.p-item:hover .pi-arrow{transform:translate(4px,-4px);color:var(--blue);}
+.pi-num{font-family:'DM Mono',monospace;font-size:.52rem;color:#2a3a4a;letter-spacing:.1em;align-self:start;padding-top:4px;}
+.pi-name{font-family:'Unbounded',sans-serif;font-weight:300;font-size:clamp(.88rem,2vw,1.3rem);color:rgba(255,255,255,.9);letter-spacing:-.02em;transition:color .3s;margin-bottom:.6rem;display:block;}
+.pi-intro{font-family:'Libre Baskerville',serif;font-size:.75rem;color:rgba(255,255,255,.3);line-height:1.6;margin-bottom:.7rem;font-style:italic;}
+.pi-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.pi-tag{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.08em;padding:4px 10px;border:1px solid rgba(56,189,248,.25);color:rgba(56,189,248,.6);border-radius:20px;background:rgba(56,189,248,.04);transition:all .3s;}
+.p-item:hover .pi-tag{border-color:rgba(56,189,248,.4);color:rgba(56,189,248,.85);background:rgba(56,189,248,.08);}
+.pi-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.pi-arrow{font-size:1.2rem;color:rgba(255,255,255,.1);transition:all .3s;}
+.pi-wip{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.1em;padding:3px 9px;border-radius:20px;text-transform:uppercase;border:1px solid var(--blue-border);color:var(--blue);}
+.pi-live{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.1em;padding:3px 9px;border-radius:20px;text-transform:uppercase;border:1px solid rgba(56,189,248,.15);color:rgba(56,189,248,.5);}
+
+/* ── SKILLS ── */
+#skills{background:var(--dark2);border-top:1px solid var(--blue-border);padding:9rem 4rem;}
+.sk-layout{display:grid;grid-template-columns:1fr 2fr;gap:6rem;}
+.sk-label{font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:1.5rem;font-family:'DM Mono',monospace;}
+.sk-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.8rem,3vw,2.5rem);letter-spacing:-.03em;color:#fff;line-height:1.1;position:sticky;top:3rem;}
+.sk-title em{font-family:'Libre Baskerville',serif;font-style:italic;font-weight:400;color:var(--blue);}
+.sk-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--blue-border);}
+.sk-block{background:var(--dark2);padding:2rem;transition:background .3s;}
+.sk-block:hover{background:#0a1525;}
+.sk-cat{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);margin-bottom:1rem;}
+.sk-list{font-family:'Libre Baskerville',serif;font-size:.8rem;color:rgba(255,255,255,.35);line-height:2.1;}
+
+/* ── CONTACT ── */
+#contact{background:var(--dark);min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9rem 4rem;border-top:1px solid var(--blue-border);position:relative;overflow:hidden;text-align:center;}
+.c-aurora{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 100%,rgba(56,189,248,.12) 0%,transparent 60%);pointer-events:none;}
+.c-label{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:2rem;}
+.c-head{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(2.5rem,7vw,7rem);line-height:.92;letter-spacing:-.04em;color:#fff;margin-bottom:1.5rem;}
+.c-head em{font-family:'Libre Baskerville',serif;font-style:italic;font-weight:400;color:var(--blue);}
+.c-sub{font-family:'DM Mono',monospace;font-size:.62rem;color:#2a3a4a;letter-spacing:.08em;margin-bottom:3.5rem;}
+.c-links{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;}
+.c-btn{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:.9rem 2rem;border:1px solid rgba(56,189,248,.2);color:rgba(255,255,255,.7);display:inline-flex;align-items:center;gap:8px;transition:all .3s;position:relative;overflow:hidden;}
+.c-btn::before{content:'';position:absolute;inset:0;background:var(--blue);transform:translateY(101%);transition:transform .35s cubic-bezier(.76,0,.24,1);}
+.c-btn:hover{color:#000;border-color:var(--blue);}
 .c-btn:hover::before{transform:translateY(0);}
 .c-btn span{position:relative;z-index:1;}
-.c-foot{position:absolute;bottom:2.5rem;left:3rem;right:3rem;display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.06);padding-top:1.5rem;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;color:#555;text-transform:uppercase;}
+.c-foot{position:absolute;bottom:2.5rem;left:4rem;right:4rem;display:flex;justify-content:space-between;border-top:1px solid var(--blue-border);padding-top:1.5rem;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;color:#2a3a4a;text-transform:uppercase;}
 
-/* RESPONSIVE */
+/* ── RESPONSIVE ── */
 @media(max-width:768px){
-  nav,#hero,#about,#stack,#projects,#skills,#contact{padding-left:1.5rem;padding-right:1.5rem;}
-  #about,.sk-layout{grid-template-columns:1fr;gap:2rem;}
+  nav{padding:1.4rem 1.5rem;}
+  .n-name{display:none;}
+  #hero,#about,#stack,#projects,#skills,#contact{padding-left:1.5rem;padding-right:1.5rem;}
+  #about{grid-template-columns:1fr;gap:2.5rem;padding-top:6rem;}
   .a-body{padding-top:0;}
-  .h-name{font-size:3rem;}
-  .c-head{font-size:2.5rem;}
-  .p-item{grid-template-columns:50px 1fr;}
-  .pi-right{display:none;}
+  .sk-layout{grid-template-columns:1fr;gap:2.5rem;}
   .sk-grid{grid-template-columns:1fr;}
-  .h-bottom{flex-direction:column;gap:2rem;align-items:flex-start;}
+  .sk-title{position:static;}
+  .s-grid{grid-template-columns:1fr;}
+  .h-ctas{flex-direction:column;align-items:center;}
+  .h-cta-p,.h-cta-s{width:100%;max-width:260px;text-align:center;justify-content:center;}
+  .p-item{grid-template-columns:40px 1fr;}
+  .pi-right{display:none;}
   .p-header{flex-direction:column;align-items:flex-start;gap:1rem;}
+  .h-stats{display:none;}
+  .c-foot{position:static;margin-top:3rem;}
   .n-links{gap:1.2rem;}
 }
 </style>
@@ -135,151 +212,213 @@ nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.8rem 3rem;display
 
 <nav>
   <a href="#" class="n-logo">
-    <img src="data:image/jpeg;base64,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" alt="Sneha" class="n-photo">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABQAFADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD13S9eUXUc1tIYpg3AJyD7e4rh/iDfxX3xwuLhZmYT+G4SUY5MbB5QV/r+NY+mpqWn69EEkfyvNDAZ4AzzmsLxxfpD8ZoZ4JAVm0ZVYA9CJXBFZOPLsTFn1N8PdRtIPh34YE9xFGzaVbEBmwTiMV5r8drqC68MaZJGwkjNvedDjP7yEVj+GIdetvCOkXkkUstpJpsIVjOowAvAAJ6EVn+LdVgYQ3F7bB9MS3nf7OsnmA5khBxz6/SsoYhyUk4vyLcLS3PH4rCGxht5jI8Vld3k6RRRnhZctwwx0IGRg9VNbt1Pbf2hc38+nwLBKFKxSEj+AZIx347+tWPDkEc2iCRyr/Y7uSSND6neM/qacvhyXU0El0JPKU5UA44rW8V7zLjCU3ZHGa54nijZDZWkRMYPlnywD759/esrwb8VodI1W9i1ax3W11aSWyTxDDwFmDZI/iGeuOfrXU+INJtrbfEkIQDNeYa/4fgMrmCPDZziuarKniIunNaM6VQqUWppnr2r2ttDbRXhVWkvAJ4ieX8tlG3H90EDPbOa5i81W0sbT7RO4AjPAT5mJPsK6H4d3l5eeBbSym06C5LRtAJnj3sNpCAAk5U4AHA6Z9aj+IUkmp+DALaw07SraaVY0toIXDuVYgNz2z29xU2TkoNGHM0rnqEreIUlcSaLbvCjny/KjVmx/tHvXmfjp5j8T9PkmtDau+mNkFAu7Ex54+teuXt/dSzko74UY6A5ryr4ku7/ABE0R3kLk6fMvOOMSqf6129DGzT1PX/B8Wsar4F0ZbOSeGOOCDckhAD7E2ZU4AC4Hqa5r4iWUiaHA0t0sy/ZrnesT79pE8XAP1rsfDLlvhToKiOSTEEQKITuI3HOMdfp0rwzxp8UG88WdtbTx2sCNGvmR4Y5YFgSOByBwOmKKcXNFTTjI634d6IBqWn26+ZcRXKu8rGPCArnIB7jnrxXZ+MNQsdC0mTybeAsowFeZYwfoT1rN+C2pWN94P0XVYUh+0mGWG6wx3Ruj7QoUnhSpDD1JPNN+MeiafqWlvHMsR85drNtG7Gc4z1xxXmVKjU+WT2PZo0o8l4Lc8x1TU11YNKIJYW5JV8EfgRwa4/ULmyhu1Sa4jQn1r02Xweui/CvUL5XEkjAGIjgICegrySxtNSknEr3Z8vADJtG3rzn8OKUUncKvNZI6n4f37ReGdUnkMAh0efdG4L5ZiWYbsHBA9h3p8t1o0mmaJZJdiVLe5WS5ZHLHLzIwHPrkkj6jisbT7+PS7S40XSpMJPKZ9wbLE5GR056fgDUOs695uspqV9bmSQGMyHgMTH90gjjsASRn613+ylVheJ48moSsz35ZszOIW4BPzE8Vxmv+Fdc1vxfpeo2dqPscEE6z3M0gjjQlkI5PJ6HoDVzUPE32bxBb6Lp8MUmoz7ipkyY4EUZLEDqfasbxPp+u6hremGS+ub+2AlN2JZAkQPy7MIOP73r71vyq2hLm3a56hpfizw/4b8KWej3Os2s93axbHa3k3KDuJ69e9eZ+MNQ8OahqIv21hoIVyESRMqMnPU4rFtvCGtrBsu9StIlEjMqRO4G3J2g4XsKdH4Q8Ua5qkOmR6pDMkh8uKC3jeSVs9vmGPxP6V2PC4VwTlPXtb/gnNHF4pT0jp/XkdJ8M9S02w8SzWFtdJKL62MisowCy4IHXqRn8queOdRl1HWoNJE5gjcZaTBOB6fWvM9TsZPA/wARtH0u4t7qO5tZTJO06GNyuCuBwAw5zke1eoxXdibp5JJlilZcxyN/EPY187i6Kp1brVH0mCrOpS1KfjLxZHB4RHhuJYZ7eNFXzYjnecfxHPXPpXlEt6lrp0v75ImbKqzngE1p+N4Lb+0ZrmSeKRFJZnC8+9W/CmqeCT4XsLqKC01W7kMn2y1vBt8hskKAPTHIPfPtiiEfeikm7tL09RYmoo316HnVuDDexTLf2zqjgkhznH5Vb1FEvn80XKFzkBA4xz65rY8T6bo1zOLnTLSKAqeYEYMh/HGc1Wh0mzubBbqS2t7f7LbP58SOyyyOAdr46YJwOPrgV6y5oe6jxm1L3rneXWnxP4suNVmEpmjnaOBg5XPOCBjlj2wK9h0X4dlNNW58QX1wJGXcLW2by1QejN94n2zXNfD7STqnxNa6njDWuloJVXHAkYfL+pZvwr1/X7hRaNk4wKzx9T2LVKnva7fr0N8BR9qnUnt0R50+m+C49Q/sx9IilmZGZTLK5LAded3Wr3gy7+G/wy0Y+LbTVdS1GO8tUQyqyyvGrkEiNQNy88Hcei814/8AGnXrnSpJL6wlAnhDFG9Mgqf0Jrx/wm7mz1TUWcpGsBRV3EKXYZyR7AfrWGGcmm5M2xUYJqMUeufG34tab4q1CDw7bW66n/Z+pyS2Wok5ZYZDzGT/AHuMZHBGM8iuisdEm1PTYEAP3OQf4a+ZYby2h+0PJIUm87cgVcn/ADmvqP4ReIoNa0K3uVcebsCyKexHFZY6LSTRtgJJtxPNviF4U1GCKVUD+WFZmY9AAOa8WjM9vMTGWUjrg9a+0fikLGDwJrOpTyRxmKzbDMcDc2EUfmf0r5AuZbEynZPGR65q8DJyg2zLHxSmrGh4WtpdZ1aCx+0SxNMG2lRuOQM4rp7zwf4htRutbg3AH8JJRv8ACuX8L6kmla3ZapGQy21yrnHdf4h+RNfW+kaJBf6Jb3YQMZow/TsRkUYqvKjJW2FhsPCtF33R0OjrD4bt58Ksk08plmccbmxgAewAArnvEXjA3KywwoysMgg1sa4TzknFef8AiJordmuODxgkelYO9RuT3Z1q1NKMdjxj4xajJJZSq7/NLKEH06n+VcJpeqNb6LLZg4VizNnuxG0fkM1vfFefzr+CIHI3M/8ASuJY7eAea7qEbQPOxEv3jHxYebJ5y1ezfAjUVtNRmt2cqrgEY56GvGbfhhXXeCNb/sbxDZXJWMxtIEkLg4QEjLDB6jHfiqrw56bSFh6ihNM9t/ap1g2fw/sNFjPly6pdCSRM5IiiGef+BFfxFfPRtY43h+UYeL07iu6+NHieDxl4ra5tJGaxtYVt7bIxlQcs2P8AaYn8AK46/XFvCw6oR+VThqfs6aTKxNRVKjaKN85j3oMAOuV/rX2t8JdUh1LwZo0yEbXsouPooB/UV8S6od0SuOqnn6GvfP2YfGEMukr4dnmC3VkS0SsfvxE54+hJH5Vz5hTcoKS6G+AqKNRxfU//2Q==" alt="Sneha" class="n-photo">
+    <span class="n-name">Sneha Agrawal</span>
   </a>
   <div class="n-links">
     <a href="#about" class="n-link">About</a>
     <a href="#stack" class="n-link">Stack</a>
     <a href="#projects" class="n-link">Work</a>
-    <a href="#skills" class="n-link">Skills</a>
     <a href="#contact" class="n-link">Contact</a>
   </div>
 </nav>
 
+<!-- ── HERO ── -->
 <section id="hero">
-  <div class="h-ghost">CLOUD</div>
-  <div class="h-tag">Cloud &amp; DevOps · Weimar, Germany · Open to Werkstudent / Internship</div>
-  <h1 class="h-name">
-    <span class="h-line"><span>Sneha</span></span>
-    <span class="h-line"><span>Agrawal</span></span>
-    <span class="h-line"><span>Engineer.</span></span>
-  </h1>
-  <div class="h-bottom">
-    <p class="h-desc">Building scalable cloud infrastructure on AWS.<br>Automating everything. Making systems that actually work.</p>
-    <div class="h-scroll"><span>Scroll</span><div class="h-scrollline"></div></div>
+  <div class="h-aurora"></div>
+  <div class="h-grid"></div>
+  <div class="h-content">
+    <h1 class="h-name">
+      <span class="h-line"><span>Sneha</span></span>
+      <span class="h-line"><span>Agrawal.</span></span>
+    </h1>
+    <div class="h-role"><span>Cloud &amp; DevOps Engineer</span></div>
+    <p class="h-desc">Building scalable infrastructure on AWS · Automating with Python · Deploying with Docker &amp; CI/CD</p>
+    <div class="h-ctas">
+      <a href="#projects" class="h-cta-p">View My Work ↗</a>
+      <a href="#contact" class="h-cta-s">Get in Touch</a>
+    </div>
   </div>
+  <div class="h-stats">
+    <div class="h-stat"><span class="h-stat-num" data-count="30">0</span><span class="h-stat-label">Certifications</span></div>
+    <div class="h-stat"><span class="h-stat-num" data-count="6">0</span><span class="h-stat-label">Projects</span></div>
+    <div class="h-stat"><span class="h-stat-num">AWS</span><span class="h-stat-label">Primary Cloud</span></div>
+    <div class="h-stat"><span class="h-stat-num">M.Sc.</span><span class="h-stat-label">CS — Bauhaus</span></div>
+  </div>
+  <div class="h-scroll"><span>Scroll</span><div class="h-scrollline"></div></div>
 </section>
 
-<section id="about">
-  <div>
-    <div class="a-label">01 — About</div>
-    <h2 class="a-title">I build<br>infrastructure<br>that scales.</h2>
+<!-- ── MARQUEE ── -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">AWS <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Docker <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Python <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">DevOps <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">CI/CD <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Lambda <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Kubernetes <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">GitHub Actions <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Cloud Architecture <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">NLP <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">LLMs <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Terraform <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">AWS <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Docker <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Python <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">DevOps <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">CI/CD <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Lambda <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Kubernetes <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">GitHub Actions <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Cloud Architecture <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">NLP <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">LLMs <span class="marquee-dot">•</span></span>
+    <span class="marquee-item">Terraform <span class="marquee-dot">•</span></span>
   </div>
-  <div class="a-body">
-    <p class="a-p">I'm an engineer pursuing my <em>M.Sc. in Computer Science</em> at Bauhaus-Universität Weimar — navigating a new country, a new language, and a new chapter simultaneously.</p>
+</div>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="reveal-left">
+    <div class="a-label">01 — About</div>
+    <h2 class="a-title">I build<br><em>infrastructure</em><br>that scales.</h2>
+  </div>
+  <div class="a-body reveal-right">
+    <p class="a-p">I'm an engineer pursuing my <em>M.Sc. in Computer Science</em> at Bauhaus-Universität Germany — navigating a new country, a new language, and a new chapter simultaneously.</p>
     <p class="a-p">My focus is <em>cloud infrastructure and DevOps</em>. I'm drawn to the systems layer — the invisible architecture that makes everything else work reliably. Automation, pipelines, scalability, observability.</p>
     <p class="a-p">Long-term, I'm building toward a <em>cloud consulting role</em> — helping organizations design and optimize architecture that lasts.</p>
     <div class="a-facts">
-      <div class="a-row"><span class="a-key">Based in</span><span class="a-val">Weimar, Germany</span></div>
-      <div class="a-row"><span class="a-key">Currently</span><span class="a-val">M.Sc. CS — Bauhaus-Universität</span></div>
-      <div class="a-row"><span class="a-key">Looking for</span><span class="a-val">Werkstudent / Internship</span></div>
-      <div class="a-row"><span class="a-key">Availability</span><span class="a-val">20 hours / week</span></div>
-      <div class="a-row"><span class="a-key">Certifications</span><span class="a-val">30+ across AWS, GCP, Azure</span></div>
+      <div class="a-row reveal reveal-delay-1"><span class="a-key">Based in</span><span class="a-val">Germany</span></div>
+      <div class="a-row reveal reveal-delay-2"><span class="a-key">Currently</span><span class="a-val">M.Sc. CS — Bauhaus-Universität</span></div>
+      <div class="a-row reveal reveal-delay-3"><span class="a-key">Looking for</span><span class="a-val">Werkstudent / Internship</span></div>
+      <div class="a-row reveal reveal-delay-4"><span class="a-key">Availability</span><span class="a-val">20 hours / week</span></div>
+      <div class="a-row reveal reveal-delay-5"><span class="a-key">Certifications</span><span class="a-val">30+ across AWS, GCP, Azure</span></div>
     </div>
   </div>
 </section>
 
+<!-- ── STACK ── -->
 <section id="stack">
-  <div class="s-label">02 — Technical Stack</div>
-  <h2 class="s-title">Tools &amp; technologies.</h2>
-  <div class="s-row"><span class="s-cat">Cloud</span><span class="s-items">AWS EC2 · S3 · Lambda · IAM · VPC · RDS · CloudWatch · CloudFormation · EBS · Route 53 · CloudFront · GCP · Azure</span></div>
-  <div class="s-row"><span class="s-cat">DevOps</span><span class="s-items">Docker · GitHub Actions · CI/CD · Nginx · Bash Scripting · Git · Linux Administration · SSH · Networking</span></div>
-  <div class="s-row"><span class="s-cat">Programming</span><span class="s-items">Python · Boto3 · SQL · R · Bash · Scikit-learn · Pandas · TF-IDF · NLP</span></div>
-  <div class="s-row"><span class="s-cat">AI &amp; LLMs</span><span class="s-items">Large Language Models · Agentic Programming · Claude API · Argumentation Theory · Sentiment Analysis</span></div>
-  <div class="s-row"><span class="s-cat">Security</span><span class="s-items">IAM Policies · Access Control · Cybersecurity Fundamentals · Ethical Hacking · Network Security</span></div>
-  <div class="s-row"><span class="s-cat">Tools</span><span class="s-items">VS Code · Jupyter Notebook · GitHub · Postman</span></div>
-  <div class="s-row"><span class="s-cat">Languages</span><span class="s-items">English — C1 Professional · Hindi — Native · German — A1 (actively learning)</span></div>
-</section>
-
-<section id="projects">
-<div class="p-header">
-<h2 class="p-title">Selected<br>work.</h2>
-<span class="p-count">03 — 06 PROJECTS</span>
-</div>
-
-<a class="p-item" href="https://github.com/sneha020902/flask-devops-pipeline" target="_blank">
-<span class="pi-num">01</span>
-<div><div class="pi-name">Flask DevOps Pipeline — CI/CD on AWS</div><div class="pi-tags"><span class="pi-tag">Docker</span><span class="pi-tag">GitHub Actions</span><span class="pi-tag">AWS EC2</span><span class="pi-tag">Nginx</span><span class="pi-tag">CloudWatch</span></div></div>
-<div class="pi-right"><span class="pi-wip">In Progress</span><span class="pi-arrow">↗</span></div>
-</a>
-
-<a class="p-item" href="https://github.com/sneha020902" target="_blank">
-<span class="pi-num">02</span>
-<div><div class="pi-name">LLM Debate Arena — Bauhaus University</div><div class="pi-tags"><span class="pi-tag">Python</span><span class="pi-tag">LLMs</span><span class="pi-tag">Claude API</span><span class="pi-tag">Agentic Programming</span></div></div>
-<div class="pi-right"><span class="pi-wip">In Progress</span><span class="pi-arrow">↗</span></div>
-</a>
-
-<a class="p-item" href="https://github.com/sneha020902/multi-tier-flask-aws-app" target="_blank">
-<span class="pi-num">03</span>
-<div><div class="pi-name">Multi-Tier Flask Web Application on AWS</div><div class="pi-tags"><span class="pi-tag">Flask</span><span class="pi-tag">EC2</span><span class="pi-tag">RDS</span><span class="pi-tag">Python</span><span class="pi-tag">PyMySQL</span></div></div>
-<div class="pi-right"><span class="pi-live">Deployed</span><span class="pi-arrow">↗</span></div>
-</a>
-
-<a class="p-item" href="https://github.com/sneha020902/DevOps-Project-cost-optimization" target="_blank">
-<span class="pi-num">04</span>
-<div><div class="pi-name">AWS Cloud Cost Optimization Automation</div><div class="pi-tags"><span class="pi-tag">Python</span><span class="pi-tag">Lambda</span><span class="pi-tag">Boto3</span><span class="pi-tag">CloudWatch Logs</span></div></div>
-<div class="pi-right"><span class="pi-live">Deployed</span><span class="pi-arrow">↗</span></div>
-</a>
-
-<a class="p-item" href="https://github.com/sneha020902/AWS-2048-game" target="_blank">
-<span class="pi-num">05</span>
-<div><div class="pi-name">Containerized 2048 Game on AWS</div><div class="pi-tags"><span class="pi-tag">Docker</span><span class="pi-tag">S3</span><span class="pi-tag">CloudFront</span><span class="pi-tag">Route 53</span></div></div>
-<div class="pi-right"><span class="pi-live">Live</span><span class="pi-arrow">↗</span></div>
-</a>
-
-<a class="p-item" href="https://github.com/sneha020902/Twitter-sentiment-analysis" target="_blank">
-<span class="pi-num">06</span>
-<div><div class="pi-name">Twitter Sentiment Analysis — NLP Pipeline</div><div class="pi-tags"><span class="pi-tag">Python</span><span class="pi-tag">NLP</span><span class="pi-tag">Scikit-learn</span><span class="pi-tag">TF-IDF</span><span class="pi-tag">Pandas</span></div></div>
-<div class="pi-right"><span class="pi-live">Live</span><span class="pi-arrow">↗</span></div>
-</a>
-
-</section>
-<section id="skills">
-  <div class="sk-layout">
-    <h2 class="sk-title">What I<br>work<br>with.</h2>
-    <div class="sk-grid">
-      <div class="sk-block"><div class="sk-cat">Cloud</div><div class="sk-list">AWS EC2 · S3 · Lambda<br>IAM · VPC · RDS<br>CloudWatch · CloudFormation<br>GCP · Azure</div></div>
-      <div class="sk-block"><div class="sk-cat">DevOps</div><div class="sk-list">Docker · GitHub Actions<br>CI/CD · Nginx · Bash<br>Linux Administration<br>SSH · Networking</div></div>
-      <div class="sk-block"><div class="sk-cat">Programming</div><div class="sk-list">Python · Boto3<br>SQL · R · Bash<br>Scikit-learn · Pandas</div></div>
-      <div class="sk-block"><div class="sk-cat">AI &amp; Research</div><div class="sk-list">LLMs · NLP<br>Agentic Programming<br>Claude API · TF-IDF<br>Argumentation Theory</div></div>
-    </div>
+  <div class="s-label reveal">02 — Technical Stack</div>
+  <h2 class="s-title reveal">The <em>stack</em><br>behind the work.</h2>
+  <div class="s-grid">
+    <div class="s-card reveal reveal-delay-1"><div class="s-cat">Cloud</div><div class="s-items">AWS EC2 · S3 · Lambda · IAM · VPC · RDS · CloudWatch · CloudFormation · EBS · Route 53 · CloudFront · GCP · Azure</div></div>
+    <div class="s-card reveal reveal-delay-2"><div class="s-cat">DevOps</div><div class="s-items">Docker · GitHub Actions · CI/CD · Nginx · Bash Scripting · Git · Linux Administration · SSH · Networking</div></div>
+    <div class="s-card reveal reveal-delay-3"><div class="s-cat">Programming</div><div class="s-items">Python · Boto3 · SQL · R · Bash · Scikit-learn · Pandas · TF-IDF · NLP</div></div>
+    <div class="s-card reveal reveal-delay-1"><div class="s-cat">AI &amp; LLMs</div><div class="s-items">Large Language Models · Agentic Programming · Claude API · Argumentation Theory · Sentiment Analysis</div></div>
+    <div class="s-card reveal reveal-delay-2"><div class="s-cat">Security</div><div class="s-items">IAM Policies · Access Control · Cybersecurity Fundamentals · Ethical Hacking · Network Security</div></div>
+    <div class="s-card reveal reveal-delay-3"><div class="s-cat">Languages</div><div class="s-items">English — C1 Professional · Hindi — Native · German — A1 (actively learning)</div></div>
   </div>
 </section>
 
+<!-- ── PROJECTS ── -->
+<section id="projects">
+  <div class="p-header reveal">
+    <h2 class="p-title">Selected<br><em>work.</em></h2>
+    <span class="p-count">06 PROJECTS</span>
+  </div>
+  <a class="p-item reveal reveal-delay-1" href="https://github.com/sneha020902/flask-devops-pipeline" target="_blank">
+    <span class="pi-num">01</span>
+    <div><div class="pi-name">Flask DevOps Pipeline — CI/CD on AWS</div><div class="pi-intro">Automating deployment of a Flask app using Docker, GitHub Actions, and Nginx on AWS EC2.</div><div class="pi-tags"><span class="pi-tag">Docker</span><span class="pi-tag">GitHub Actions</span><span class="pi-tag">AWS EC2</span><span class="pi-tag">Nginx</span><span class="pi-tag">CloudWatch</span></div></div>
+    <div class="pi-right"><span class="pi-wip">In Progress</span><span class="pi-arrow">↗</span></div>
+  </a>
+  <a class="p-item reveal reveal-delay-2" href="https://github.com/sneha020902" target="_blank">
+    <span class="pi-num">02</span>
+    <div><div class="pi-name">LLM Debate Arena — Bauhaus University</div><div class="pi-intro">Research project exploring LLM-driven argumentation, debate scoring, and agentic AI systems.</div><div class="pi-tags"><span class="pi-tag">Python</span><span class="pi-tag">LLMs</span><span class="pi-tag">Claude API</span><span class="pi-tag">Agentic Programming</span></div></div>
+    <div class="pi-right"><span class="pi-wip">In Progress</span><span class="pi-arrow">↗</span></div>
+  </a>
+  <a class="p-item reveal reveal-delay-3" href="https://github.com/sneha020902/multi-tier-flask-aws-app" target="_blank">
+    <span class="pi-num">03</span>
+    <div><div class="pi-name">Multi-Tier Flask Web Application on AWS</div><div class="pi-intro">End-to-end 3-tier architecture on AWS — Flask backend, EC2 server, and RDS MySQL database.</div><div class="pi-tags"><span class="pi-tag">Flask</span><span class="pi-tag">EC2</span><span class="pi-tag">RDS</span><span class="pi-tag">Python</span><span class="pi-tag">PyMySQL</span></div></div>
+    <div class="pi-right"><span class="pi-live">Deployed</span><span class="pi-arrow">↗</span></div>
+  </a>
+  <a class="p-item reveal reveal-delay-4" href="https://github.com/sneha020902/DevOps-Project-cost-optimization" target="_blank">
+    <span class="pi-num">04</span>
+    <div><div class="pi-name">AWS Cloud Cost Optimization Automation</div><div class="pi-intro">Serverless Lambda function that auto-detects and deletes stale EBS snapshots to reduce cloud spend.</div><div class="pi-tags"><span class="pi-tag">Python</span><span class="pi-tag">Lambda</span><span class="pi-tag">Boto3</span><span class="pi-tag">CloudWatch Logs</span></div></div>
+    <div class="pi-right"><span class="pi-live">Deployed</span><span class="pi-arrow">↗</span></div>
+  </a>
+  <a class="p-item reveal reveal-delay-5" href="https://github.com/sneha020902/AWS-2048-game" target="_blank">
+    <span class="pi-num">05</span>
+    <div><div class="pi-name">Containerized 2048 Game on AWS</div><div class="pi-intro">Dockerized 2048 game deployed on AWS with S3, CloudFront CDN, and Route 53 for global delivery.</div><div class="pi-tags"><span class="pi-tag">Docker</span><span class="pi-tag">S3</span><span class="pi-tag">CloudFront</span><span class="pi-tag">Route 53</span></div></div>
+    <div class="pi-right"><span class="pi-live">Live</span><span class="pi-arrow">↗</span></div>
+  </a>
+  <a class="p-item reveal reveal-delay-1" href="https://github.com/sneha020902/Social-Media-Sentiment-Analysis" target="_blank">
+    <span class="pi-num">06</span>
+    <div><div class="pi-name">Social Media Sentiment &amp; Emotion Analysis</div><div class="pi-intro">ML pipeline classifying 1.6M posts by sentiment and emotion — joy, anger, sadness — with 77% accuracy.</div><div class="pi-tags"><span class="pi-tag">Python</span><span class="pi-tag">NLP</span><span class="pi-tag">Emotion Detection</span><span class="pi-tag">Scikit-learn</span><span class="pi-tag">ML</span></div></div>
+    <div class="pi-right"><span class="pi-live">Deployed</span><span class="pi-arrow">↗</span></div>
+  </a>
+</section>
+
+
+
+<!-- ── CONTACT ── -->
 <section id="contact">
-  <div class="c-ghost">HELLO</div>
-  <div class="c-label">Get in touch</div>
-  <h2 class="c-head">Let's build<br>something<br><em>great.</em></h2>
-  <div class="c-links">
+  <div class="c-aurora"></div>
+  <div class="c-label reveal">05 — Get in touch</div>
+  <h2 class="c-head reveal">Let's build<br>something <em>great.</em></h2>
+  <p class="c-sub reveal">Open to Werkstudent · Internship · Freelance · Full-time</p>
+  <div class="c-links reveal">
     <a href="mailto:sneha010902@gmail.com" class="c-btn"><span>sneha010902@gmail.com ↗</span></a>
-    <a href="tel:+4917665744911" class="c-btn"><span>+49 176 657 44911 ↗</span></a>
     <a href="https://www.linkedin.com/in/-snehaagrawal" target="_blank" class="c-btn"><span>LinkedIn ↗</span></a>
     <a href="https://github.com/sneha020902" target="_blank" class="c-btn"><span>GitHub ↗</span></a>
   </div>
   <div class="c-foot">
     <span>© 2026 Sneha Agrawal</span>
-    <span>Weimar, Germany</span>
+    <span>Germany</span>
   </div>
 </section>
 
 <script>
+// ── CURSOR
 const cur=document.getElementById('cur');
-let mx=0,my=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
-document.querySelectorAll('a,button,.p-item,.sk-block').forEach(el=>{
+document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';});
+document.querySelectorAll('a,button,.p-item,.sk-block,.s-card').forEach(el=>{
   el.addEventListener('mouseenter',()=>cur.classList.add('big'));
   el.addEventListener('mouseleave',()=>cur.classList.remove('big'));
 });
+
+// ── LOADER
 let p=0;
 const bar=document.getElementById('lbar'),pct=document.getElementById('lpct'),loader=document.getElementById('loader');
 const iv=setInterval(()=>{
   p+=Math.random()*12+3;
-  if(p>=100){p=100;clearInterval(iv);setTimeout(()=>loader.classList.add('gone'),400);}
+  if(p>=100){p=100;clearInterval(iv);setTimeout(()=>{loader.classList.add('gone');startCounters();},400);}
   bar.style.width=p+'%';pct.textContent=Math.floor(p)+'%';
 },80);
+
+// ── SMOOTH SCROLL
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'});});
 });
+
+// ── SCROLL REVEAL
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');}});
+},{threshold:0.12});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>observer.observe(el));
+
+// ── NUMBER COUNTER
+function animateCounter(el,target,suffix=''){
+  let start=0;
+  const duration=1800;
+  const step=timestamp=>{
+    if(!start)start=timestamp;
+    const progress=Math.min((timestamp-start)/duration,1);
+    const ease=1-Math.pow(1-progress,3);
+    el.textContent=Math.floor(ease*target)+(progress===1?suffix:'');
+    if(progress<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function startCounters(){
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    const target=parseInt(el.getAttribute('data-count'));
+    const suffix=el.getAttribute('data-suffix')||'+';
+    animateCounter(el,target,suffix);
+  });
+}
 </script>
 </body>
 </html>
